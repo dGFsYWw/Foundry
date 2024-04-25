@@ -11,6 +11,10 @@
 				"type": "constructor"
 			},
 			{
+				"stateMutability": "payable",
+				"type": "fallback"
+			},
+			{
 				"inputs": [
 					{
 						"internalType": "address",
@@ -87,6 +91,10 @@
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
+			},
+			{
+				"stateMutability": "payable",
+				"type": "receive"
 			}
 		],
 		"devdoc": {
@@ -125,11 +133,11 @@
 			]
 		},
 		"github/dGFsYWw/Foundry/FundMe.sol": {
-			"keccak256": "0xe6da32aa0161aa5483330e1fd837cda23aaf3d3c2d79d8afd9ff36114c69523f",
+			"keccak256": "0x7783008f6950735ceadd56321e25c03bc007724a985a2313c86e0e19f8a90be9",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://51ef4b83f67b99423839834af2c7981a3059f484de478e4e73baa259586d03de",
-				"dweb:/ipfs/QmfVEFqX4rEiaw4rSGRNkpThjuqEAD8tKzubghVQMXsw5V"
+				"bzz-raw://16af0738262d2e0db2db9f763b034e598f2fd7ba9183a26033445572e07522d9",
+				"dweb:/ipfs/QmcjVmgm2LW4dcxvbugtM7LkCJAx3r1EyG9NGJJaboDNq4"
 			]
 		},
 		"github/dGFsYWw/Foundry/PriceConverter.sol": {

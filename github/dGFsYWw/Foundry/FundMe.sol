@@ -10,7 +10,9 @@ contract FundMe {
     // ??
     using PriceConverter for uint256;
 
-    uint256 public minUSD = 5e18; // Minimum value acceptable in USD
+    uint256 public constant minUSD = 5e18; // Minimum value acceptable in USD
+    // If a variable will be assigned to a constant value, use CONSTANT to reduce gas fees on compiling
+    // Constant variable are usually written in uppercase w/ underscores: MIN_USD
     
     // Moving dataFeed into a library
     //AggregatorV3Interface public dataFeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306); // Declare dataFeed variable at the contract level
@@ -21,7 +23,7 @@ contract FundMe {
 
     // Creating a constructor
     address public owner;
-    constructor() {
+    constructor() { // To initialize certain varaibles at the moment of contract creation 
         owner = msg.sender; // Making the contract deployer the owner of the contract; the only one who can w/draw
     }
 
@@ -57,11 +59,13 @@ contract FundMe {
         require(msg.value.getConversionRate() >= minUSD, "Not enough ETH baby!");
         funders.push(msg.sender);
         //msg.sender is a global variable used to track who called the contract (address of EOA or another contract)
+        //addressToAmountFunded[msg.sender] = addressToAmountFunded[msg.sender] + msg.value; // Below is a more efficient format
         addressToAmountFunded[msg.sender] += msg.value;
         // The line above adds any additional funding from the same address (to keep track to cumulitive funding)
     }
 
     function withdraw() public onlyOwner { // onlyOwner modifier gets executed first (i.e. only contract owner gets to run this function
+        // We want anyone to able to fund the contract, but only the 0x that deployed it to be able to w/draw (owner)
         // step 0: restrict this function to the owner only
         // step 1: reset values in our mapping table to 0
         // step 2: reset the addresses in our mapping table by creating a new array
@@ -79,14 +83,19 @@ contract FundMe {
         }
 
         // step 2
-        funders = new address[](0);
+        funders = new address[](0); // This syntax resets the array
 
         // step 3
             // we can transfer, send, or call
+
+            // Transfer:
             //payable(msg.sender).transfer((address(this).balance));
             // Need to make the msg.sender address payable
-            //call is the recommended way to send tokens on Ethereum (lower-level function; maybe harder to grasp at 1st)
-            //call doesn't have a prerequisite amount of gas and doesn't throw an error if it fails; it returns a bool (T/F)
+            // 'This' refers to the FundMe contract 0x 
+            // Downside of transfer is that if the transaction fails, it's throw an error and revert (<-- why is this a problem?)
+
+            // Call is the recommended way to send tokens on Ethereum (lower-level function; maybe harder to grasp at 1st)
+            // Call doesn't have a prerequisite amount of gas and doesn't throw an error if it fails; it returns a bool (T/F)
             (bool callSuccess, ) = payable(msg.sender).call{value: address(this).balance}("");
             require(callSuccess, "Call failed");
     }
@@ -96,4 +105,14 @@ contract FundMe {
         _;
     }
 
+    // What happens if someone sends ETH w/o calling our fund() -- he will not be captured in out logic and will not be added to Funders[]
+    // receive() and fallback() are special functions within Solidity that handle situations when the contract is sent ETH or data
+
+    receive() external payable { // Sender of ETH not using fund() will be processed through fund()
+        fund();
+    }
+
+    fallback() external payable {
+        fund();
+    }
 }
